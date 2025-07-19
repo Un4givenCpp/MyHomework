@@ -1,8 +1,2 @@
 .vs/
 x64/
-Debug/
-Release/
-*.sln
-*.vcxproj*
-*.filters
-*.user
