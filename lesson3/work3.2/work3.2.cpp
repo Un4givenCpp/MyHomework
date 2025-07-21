@@ -3,43 +3,70 @@
 #include <string>
 #include <windows.h>
 
-struct Address 
+class Address 
 {
+private:
     std::string city;
     std::string street;
     int house;
     int apartment;
+
+public:
+
+    Address() : house(0), apartment(0) {}
+
+    void setCity(const std::string& c) { city = c; }
+    void setStreet(const std::string& s) { street = s; }
+    void setHouse(int h) { house = h; }
+    void setApartment(int a) { apartment = a; }
+
+    std::string getCity() const { return city; }
+    std::string getStreet() const { return street; }
+    int getHouse() const { return house; }
+    int getApartment() const { return apartment; }
+
+ 
+    std::string getFormattedAddress() const 
+    {
+        return city + ", " + street + ", " + std::to_string(house) + ", " + std::to_string(apartment);
+    }
+
+    bool operator>(const Address& other) const 
+    {
+        return city > other.city;
+    }
+
+    void swap(Address& other) 
+    {
+        std::swap(city, other.city);
+        std::swap(street, other.street);
+        std::swap(house, other.house);
+        std::swap(apartment, other.apartment);
+    }
 };
 
-void swapAddresses(Address& a, Address& b) 
-{
-    Address temp = a;
-    a = b;
-    b = temp;
-}
+class AddressProcessor {
+public:
 
-
-void bubbleSort(Address* addresses, int N) 
-{
-    for (int i = 0; i < N - 1; ++i) 
+    static void bubbleSort(Address* addresses, int N) 
     {
-        for (int j = 0; j < N - i - 1; ++j) 
-        {
-            if (addresses[j].city > addresses[j + 1].city) 
-            {
-                swapAddresses(addresses[j], addresses[j + 1]);
+        for (int i = 0; i < N - 1; ++i) {
+            for (int j = 0; j < N - i - 1; ++j) {
+                if (addresses[j] > addresses[j + 1]) {
+                    addresses[j].swap(addresses[j + 1]);
+                }
             }
         }
     }
-}
+};
 
-int main() {
-
+int main() 
+{
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
 
     std::ifstream inFile("in.txt");
-    if (!inFile.is_open())
+    if (!inFile.is_open()) 
     {
         std::cerr << "Не удалось открыть файл in.txt" << std::endl;
         return 1;
@@ -53,17 +80,24 @@ int main() {
 
     for (int i = 0; i < N; ++i) 
     {
-        std::getline(inFile, addresses[i].city);
-        std::getline(inFile, addresses[i].street);
-        inFile >> addresses[i].house;
-        inFile.ignore(); 
-        inFile >> addresses[i].apartment;
+        std::string city, street;
+        int house, apartment;
+
+        std::getline(inFile, city);
+        std::getline(inFile, street);
+        inFile >> house;
         inFile.ignore();
+        inFile >> apartment;
+        inFile.ignore();
+
+        addresses[i].setCity(city);
+        addresses[i].setStreet(street);
+        addresses[i].setHouse(house);
+        addresses[i].setApartment(apartment);
     }
     inFile.close();
 
-    bubbleSort(addresses, N);
-
+    AddressProcessor::bubbleSort(addresses, N);
 
     std::ofstream outFile("out.txt");
     if (!outFile.is_open()) 
@@ -77,10 +111,7 @@ int main() {
 
     for (int i = 0; i < N; ++i) 
     {
-        outFile << addresses[i].city << ", "
-            << addresses[i].street << ", "
-            << addresses[i].house << ", "
-            << addresses[i].apartment << std::endl;
+        outFile << addresses[i].getFormattedAddress() << std::endl;
     }
 
     delete[] addresses;

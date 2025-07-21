@@ -3,17 +3,37 @@
 #include <string>
 #include <windows.h>
 
-
-struct Address 
+class Address 
 {
+private:
     std::string city;
     std::string street;
     int house;
     int apartment;
+
+public:
+    
+    Address() : house(0), apartment(0) {}
+
+   
+    void setCity(const std::string& c) { city = c; }
+    void setStreet(const std::string& s) { street = s; }
+    void setHouse(int h) { house = h; }
+    void setApartment(int a) { apartment = a; }
+
+  
+    std::string getCity() const { return city; }
+    std::string getStreet() const { return street; }
+    int getHouse() const { return house; }
+    int getApartment() const { return apartment; }
+
+    std::string getFormattedAddress() const 
+    {
+        return city + ", " + street + ", " + std::to_string(house) + ", " + std::to_string(apartment);
+    }
 };
 
 int main() {
-
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
 
@@ -32,17 +52,25 @@ int main() {
 
     for (int i = 0; i < N; ++i) 
     {
-        std::getline(inFile, addresses[i].city);
-        std::getline(inFile, addresses[i].street);
-        inFile >> addresses[i].house;
-        inFile.ignore(); 
-        inFile >> addresses[i].apartment;
+        std::string city, street;
+        int house, apartment;
+
+        std::getline(inFile, city);
+        std::getline(inFile, street);
+        inFile >> house;
         inFile.ignore();
+        inFile >> apartment;
+        inFile.ignore();
+
+        addresses[i].setCity(city);
+        addresses[i].setStreet(street);
+        addresses[i].setHouse(house);
+        addresses[i].setApartment(apartment);
     }
     inFile.close();
 
     std::ofstream outFile("out.txt");
-    if (!outFile.is_open())
+    if (!outFile.is_open()) 
     {
         std::cerr << "Не удалось создать файл out.txt" << std::endl;
         delete[] addresses;
@@ -53,10 +81,7 @@ int main() {
 
     for (int i = N - 1; i >= 0; --i) 
     {
-        outFile << addresses[i].city << ", "
-            << addresses[i].street << ", "
-            << addresses[i].house << ", "
-            << addresses[i].apartment << std::endl;
+        outFile << addresses[i].getFormattedAddress() << std::endl;
     }
 
     delete[] addresses;
